@@ -1,5 +1,4 @@
 using Godot;
-using System;
 
 public class Player : Area2D
 {
@@ -14,12 +13,14 @@ public class Player : Area2D
     private Vector2 velocity;
 
     private AnimatedSprite animatedSprite;
+    private CollisionShape2D collisionShape2D;
 
     public override void _Ready()
     {
         screenSize = GetViewportRect().Size;
         velocity = Vector2.Zero;
         animatedSprite = GetNode<AnimatedSprite>("AnimatedSprite");
+        collisionShape2D = GetNode<CollisionShape2D>("CollisionShape2D");
         Hide();
     }
 
@@ -57,15 +58,14 @@ public class Player : Area2D
     }
     public void OnPlayerBodyEntered(PhysicsBody2D body)
     {
-        GD.Print("public void OnPlayerBodyEntered() works.");
         Hide(); //disappears after hit
         EmitSignal(nameof(Hit)); // эмиссия сигнала Hit()
-        GetNode<CollisionShape2D>("CollisionShape2D").SetDeferred("disabled", true); //setdeferred это безопасный вариант set, не возбуждающий ошибки
+        collisionShape2D.SetDeferred("disabled", true); //setdeferred это безопасный вариант set, не возбуждающий ошибки
     }
     public void Start(Vector2 pos)
     {
         Position = pos;
         Show();
-        GetNode<CollisionShape2D>("CollisionShape2D").Disabled = false;
+        collisionShape2D.Disabled = false;
     }
 }

@@ -1,52 +1,58 @@
 using Godot;
-using System;
 
 public class HUDScript : CanvasLayer
 {
     [Signal]
     public delegate void StartGame();
 
+    private Label messageLabel;
+    private Label scoreLabel;
+    private Timer messageTimer;
+    private Button startButton;
+
+    public override void _Ready()
+    {
+        messageLabel = GetNode<Label>("Message");
+        scoreLabel = GetNode<Label>("ScoreLabel");
+        messageTimer = GetNode<Timer>("MessageTimer");
+        startButton = GetNode<Button>("StartButton");
+    }
+
     public void ShowMessage(string text)
     {
-        Label message = GetNode<Label>("Message");
-        message.Text = text;
-        message.Show();
+        messageLabel.Text = text;
+        messageLabel.Show();
 
-        GetNode<Timer>("MessageTimer").Start();
+        messageTimer.Start();
     }
 
     async public void ShowGameOver()
     {
         ShowMessage("Game Over");
-
-        Timer messageTimer = GetNode<Timer>("MessageTimer");
         await ToSignal(messageTimer, "timeout");
 
         //показали 2 сек надпись "Game Over", теперь показываем надпись "Dodge the..." =>
-
-        Label message = GetNode<Label>("Message");
-        message.Text = "Dodge the \n Creeps!";
-        message.Show();
+        messageLabel.Text = "Dodge the \n Creeps!";
+        messageLabel.Show();
 
         // => и еще через 1 сек появляется кнопка "Start"
-
         await ToSignal(GetTree().CreateTimer(1), "timeout");
-        GetNode<Button>("StartButton").Show();
+        startButton.Show();
     }
 
     public void UpdateScore(int score)
     {
-        GetNode<Label>("ScoreLabel").Text = score.ToString();
+        scoreLabel.Text = score.ToString();
     }
 
     public void OnMessageTimerTimeout()
     {
-        GetNode<Label>("Message").Hide();
+        messageLabel.Hide();
     }
 
     public void OnStartButtonPressed()
     {
-        GetNode<Button>("StartButton").Hide();
+        startButton.Hide();
         EmitSignal("StartGame");
     }
 }
