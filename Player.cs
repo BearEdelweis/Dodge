@@ -15,22 +15,27 @@ public class Player : Area2D
     private AnimatedSprite animatedSprite;
     private CollisionShape2D collisionShape2D;
 
+    private TouchInputScript touchInputScript;
+
     public override void _Ready()
     {
         screenSize = GetViewportRect().Size;
         velocity = Vector2.Zero;
         animatedSprite = GetNode<AnimatedSprite>("AnimatedSprite");
         collisionShape2D = GetNode<CollisionShape2D>("CollisionShape2D");
+        touchInputScript = GetParent().GetNode<TouchInputScript>("TouchInputScript");
         Hide();
     }
 
     public override void _Process(float delta)
     {
-        velocity = Vector2.Zero;
-        if (Input.IsActionPressed("ui_up")) velocity.y -= 1;
-        if (Input.IsActionPressed("ui_down")) velocity.y += 1;
-        if (Input.IsActionPressed("ui_left")) velocity.x -= 1;
-        if (Input.IsActionPressed("ui_right")) velocity.x += 1;
+        velocity = touchInputScript.dragSpeed;
+
+        //velocity = Vector2.Zero;
+        //if (Input.IsActionPressed("ui_up")) velocity.y -= 1;
+        //if (Input.IsActionPressed("ui_down")) velocity.y += 1;
+        //if (Input.IsActionPressed("ui_left")) velocity.x -= 1;
+        //if (Input.IsActionPressed("ui_right")) velocity.x += 1;
 
         if (velocity.Length() > 0)
         {
@@ -65,6 +70,7 @@ public class Player : Area2D
     public void Start(Vector2 pos)
     {
         Position = pos;
+        velocity = Vector2.Zero;
         Show();
         collisionShape2D.Disabled = false;
     }
